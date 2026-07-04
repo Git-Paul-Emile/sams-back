@@ -1,0 +1,59 @@
+import { StatusCodes } from "http-status-codes";
+import { achatsRepository } from "../repositories/achats.repository.js";
+import { toAchatDto } from "../dtos/achats.dto.js";
+import { AppError } from "../utils/AppError.js";
+import { parsePagination } from "../utils/pagination.js";
+import { recordAuditLog } from "../utils/auditLog.js";
+import { createWithSequenceNumber } from "../utils/sequence.js";
+import type { CreateAchatInput, ListAchatsQuery } from "../validators/achats.validator.js";
+import type { Prisma } from "../generated/prisma/client.js";
+
+interface ActionContext {
+  userId: string;
+  ip?: string | null;
+}
+
+export const achatsService = {
+  async list(query: ListAchatsQuery) {
+    const { page, pageSize, skip, take } = parsePagination(query);
+    const where: Prisma.AchatWhereInput = {
+      ...(query.statut ? { statut: query.statut } : {}),
+    };
+    const orderBy: Prisma.AchatOrderByWithRelationInput = { date: "desc" };
+
+    const [rows, total] = await Promise.all([
+      achatsRepository.findMany(where, { skip, take, orderBy }),
+      achatsRepository.count(where),
+    ]);
+
+    const items = rows.map(toAchatDto);
+    return { items, total, page, pageSize };
+  },
+
+  async get(id: string) {
+    const achat = await achatsRepository.findById(id);
+    if (!achat) throw new AppError("Achat introuvable", StatusCodes.NOT_FOUND);
+    return toAchatDto(achat);
+  },
+
+  async create(input: CreateAchatInput, ctx: ActionContext) {
+    const now = new Date();
+
+    const created = await createWithSequenceNumber(
+      "BC",
+      (likePrefix) => achatsRepository.countByNumPrefix(likePrefix),
+      (num) =>
+        achatsRepository.createWithFournisseur(input.fournisseur, {
+          num,
+          date: now,
+          livraison: input.livraison,
+          montant: input.montant,
+          articles: input.articles,
+          statut: "En attente",
+        })
+    );
+
+    await recordAuditLog({ action: "Création", module: "Achats", ref: created.num, userId: ctx.userId, ip: ctx.ip });
+    return toAchatDto(created);
+  },
+};

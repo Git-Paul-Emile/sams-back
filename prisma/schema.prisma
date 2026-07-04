@@ -1,0 +1,582 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  Direction
+  Production
+  Stock
+  Commercial
+  Finance
+  Administrateur
+}
+
+enum StockItemType {
+  MATIERE
+  PRODUIT
+}
+
+// ---------------------------------------------------------------------------
+// Auth / RBAC
+// ---------------------------------------------------------------------------
+
+model User {
+  id           String    @id @default(cuid())
+  nom          String
+  email        String    @unique
+  tel          String?
+  passwordHash String
+  role         Role
+  statut       String    @default("Actif")
+  lastLoginAt  DateTime?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  refreshTokens             RefreshToken[]
+  commandeTimelines         CommandeTimeline[]
+  mouvements                Mouvement[]
+  salesRequestsValidated    SalesRequest[]
+  materialRequestsValidated MaterialRequest[]
+  approvalRecords           ApprovalRecord[]
+  auditLogs                 AuditLog[]
+
+  @@index([role])
+}
+
+model RefreshToken {
+  id        String    @id @default(cuid())
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tokenHash String    @unique
+  expiresAt DateTime
+  revokedAt DateTime?
+  createdAt DateTime  @default(now())
+
+  @@index([userId])
+}
+
+model RolePermission {
+  role      Role     @id
+  modules   String[]
+  updatedAt DateTime @updatedAt
+}
+
+model Settings {
+  id                     Int      @id @default(1)
+  notifErpEnabled        Boolean  @default(true)
+  notifEmailEnabled      Boolean  @default(true)
+  notifWhatsappEnabled   Boolean  @default(true)
+  alertRuptureEnabled    Boolean  @default(true)
+  alertValidationEnabled Boolean  @default(true)
+  updatedAt              DateTime @updatedAt
+}
+
+// ---------------------------------------------------------------------------
+// HR-lite (commerciaux / opérateurs) + fournisseurs
+// ---------------------------------------------------------------------------
+
+model Commercial {
+  id        String   @id @default(cuid())
+  matricule String   @unique
+  nom       String
+  prenom    String
+  tel       String?
+  email     String?  @unique
+  zone      String?
+  objectif  Float    @default(0)
+  statut    String   @default("Actif")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  clients       Client[]
+  commandes     Commande[]
+  factures      Facture[]
+  salesRequests SalesRequest[]
+
+  @@index([statut])
+}
+
+model Operateur {
+  id        String    @id @default(cuid())
+  matricule String    @unique
+  nom       String
+  prenom    String
+  tel       String?
+  email     String?
+  poste     String?
+  ligne     String?
+  embauche  DateTime?
+  statut    String    @default("Actif")
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  prodOrders       ProdOrder[]
+  incidents        Incident[]
+  materialRequests MaterialRequest[]
+
+  @@index([ligne])
+}
+
+model Fournisseur {
+  id        String   @id @default(cuid())
+  nom       String   @unique
+  contact   String?
+  tel       String?
+  email     String?
+  adresse   String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  achats Achat[]
+}
+
+model Achat {
+  id            String   @id @default(cuid())
+  num           String   @unique
+  fournisseurId String
+  fournisseur   Fournisseur @relation(fields: [fournisseurId], references: [id])
+  date          DateTime
+  livraison     DateTime
+  montant       Float
+  statut        String   @default("En attente")
+  articles      Int      @default(0)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  mouvements Mouvement[]
+
+  @@index([fournisseurId])
+}
+
+// ---------------------------------------------------------------------------
+// Clients / Ventes / Facturation
+// ---------------------------------------------------------------------------
+
+model Client {
+  id           String   @id @default(cuid())
+  code         String   @unique
+  raison       String
+  contact      String?
+  tel          String?
+  email        String?
+  adresse      String?
+  ville        String?
+  pays         String?
+  zone         String?
+  commercialId String?
+  commercial   Commercial? @relation(fields: [commercialId], references: [id])
+  conditions   String?
+  plafond      Float    @default(0)
+  statut       String   @default("Actif")
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  commandes     Commande[]
+  factures      Facture[]
+  salesRequests SalesRequest[]
+
+  @@index([commercialId])
+  @@index([raison])
+}
+
+model Commande {
+  id           String   @id @default(cuid())
+  num          String   @unique
+  clientId     String
+  client       Client   @relation(fields: [clientId], references: [id])
+  date         DateTime @default(now())
+  montant      Float
+  commercialId String
+  commercial   Commercial @relation(fields: [commercialId], references: [id])
+  statutActuel String   @default("Devis")
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  timeline    CommandeTimeline[]
+  factures    Facture[]
+  mouvements  Mouvement[]
+  rentabilite CommandeRentabilite?
+
+  @@index([clientId, date])
+  @@index([commercialId])
+}
+
+model CommandeTimeline {
+  id          String   @id @default(cuid())
+  commandeId  String
+  commande    Commande @relation(fields: [commandeId], references: [id], onDelete: Cascade)
+  etat        String
+  date        DateTime @default(now())
+  userId      String?
+  user        User?    @relation(fields: [userId], references: [id])
+  commentaire String?
+
+  @@index([commandeId])
+}
+
+model Facture {
+  id           String    @id @default(cuid())
+  num          String    @unique
+  clientId     String
+  client       Client    @relation(fields: [clientId], references: [id])
+  commercialId String
+  commercial   Commercial @relation(fields: [commercialId], references: [id])
+  commandeId   String?
+  commande     Commande? @relation(fields: [commandeId], references: [id])
+  type         String
+  date         DateTime  @default(now())
+  echeance     DateTime
+  montant      Float
+  paye         Float     @default(0)
+  statut       String    @default("Émise")
+  mode         String    @default("—")
+  dateReglPrev DateTime?
+  dateReglEff  DateTime?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  @@index([clientId])
+  @@index([commandeId])
+}
+
+// ---------------------------------------------------------------------------
+// Stock / Production
+// ---------------------------------------------------------------------------
+
+model StockItem {
+  id          String        @id @default(cuid())
+  code        String        @unique
+  designation String
+  type        StockItemType
+  categorie   String
+  unite       String
+  stock       Float         @default(0)
+  min         Float         @default(0)
+  critique    Float         @default(0)
+  valeurUnit  Float         @default(0)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  mouvements          Mouvement[]
+  bomAsProduit        Bom?
+  bomLinesAsMatiere   BomLine[]
+  prodOrders          ProdOrder[]
+  salesRequests       SalesRequest[]
+  materialRequests    MaterialRequest[]
+  productCost         ProductCost?
+  productCostBomLines ProductCostBomLine[]
+  matierePrixStat     MatierePrixStat?
+
+  @@index([type, categorie])
+}
+
+model Mouvement {
+  id                String   @id @default(cuid())
+  date              DateTime @default(now())
+  type              String
+  stockItemId       String
+  stockItem         StockItem @relation(fields: [stockItemId], references: [id])
+  qte               Float
+  userId            String?
+  user              User?    @relation(fields: [userId], references: [id])
+  motif             String?
+  commandeId        String?
+  commande          Commande? @relation(fields: [commandeId], references: [id])
+  achatId           String?
+  achat             Achat?    @relation(fields: [achatId], references: [id])
+  prodOrderId       String?
+  prodOrder         ProdOrder? @relation(fields: [prodOrderId], references: [id])
+  salesRequestId    String?
+  salesRequest      SalesRequest? @relation(fields: [salesRequestId], references: [id])
+  materialRequestId String?
+  materialRequest   MaterialRequest? @relation(fields: [materialRequestId], references: [id])
+  createdAt         DateTime @default(now())
+
+  @@index([stockItemId, date])
+}
+
+model Bom {
+  id        String   @id @default(cuid())
+  produitId String   @unique
+  produit   StockItem @relation(fields: [produitId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  items BomLine[]
+}
+
+model BomLine {
+  id        String   @id @default(cuid())
+  bomId     String
+  bom       Bom      @relation(fields: [bomId], references: [id], onDelete: Cascade)
+  matiereId String
+  matiere   StockItem @relation(fields: [matiereId], references: [id])
+  qte       Float
+  unite     String
+
+  @@index([bomId])
+  @@index([matiereId])
+}
+
+model ProdOrder {
+  id            String   @id @default(cuid())
+  num           String   @unique
+  produitId     String
+  produit       StockItem @relation(fields: [produitId], references: [id])
+  ligne         String
+  qtePrev       Float
+  qteReel       Float    @default(0)
+  debut         DateTime
+  fin           DateTime
+  responsableId String?
+  responsable   Operateur? @relation(fields: [responsableId], references: [id])
+  statut        String   @default("Planifié")
+  rendement     Float    @default(0)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  incidents        Incident[]
+  mouvements       Mouvement[]
+  materialRequests MaterialRequest[]
+
+  @@index([produitId, statut])
+}
+
+model Incident {
+  id          String    @id @default(cuid())
+  prodOrderId String
+  prodOrder   ProdOrder @relation(fields: [prodOrderId], references: [id])
+  operateurId String?
+  operateur   Operateur? @relation(fields: [operateurId], references: [id])
+  categorie   String
+  description String
+  date        DateTime  @default(now())
+  statut      String    @default("Ouvert")
+  gravite     String
+  createdAt   DateTime  @default(now())
+
+  @@index([prodOrderId])
+}
+
+// ---------------------------------------------------------------------------
+// Validations (sorties : demandes de vente / demandes de matières)
+// ---------------------------------------------------------------------------
+
+model SalesRequest {
+  id             String    @id @default(cuid())
+  num            String    @unique
+  date           DateTime  @default(now())
+  clientId       String
+  client         Client    @relation(fields: [clientId], references: [id])
+  commercialId   String
+  commercial     Commercial @relation(fields: [commercialId], references: [id])
+  produitId      String
+  produit        StockItem @relation(fields: [produitId], references: [id])
+  qteDemandee    Float
+  qteValidee     Float?
+  stockDispo     Float?
+  prixUnit       Float
+  montant        Float
+  entrepot       String?
+  observation    String?
+  statut         String    @default("En attente de validation")
+  valideurId     String?
+  valideur       User?     @relation(fields: [valideurId], references: [id])
+  dateValidation DateTime?
+  commentaire    String?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  mouvements      Mouvement[]
+  approvalRecords ApprovalRecord[]
+
+  @@index([statut])
+  @@index([clientId])
+}
+
+model MaterialRequest {
+  id             String    @id @default(cuid())
+  num            String    @unique
+  date           DateTime  @default(now())
+  prodOrderId    String
+  prodOrder      ProdOrder @relation(fields: [prodOrderId], references: [id])
+  operateurId    String?
+  operateur      Operateur? @relation(fields: [operateurId], references: [id])
+  ligne          String
+  matiereId      String
+  matiere        StockItem @relation(fields: [matiereId], references: [id])
+  qteDemandee    Float
+  qteValidee     Float?
+  commentaires   String?
+  statut         String    @default("En attente de validation")
+  valideurId     String?
+  valideur       User?     @relation(fields: [valideurId], references: [id])
+  dateValidation DateTime?
+  docBC          String?
+  docBL          String?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  mouvements      Mouvement[]
+  approvalRecords ApprovalRecord[]
+
+  @@index([statut])
+  @@index([prodOrderId])
+}
+
+model ApprovalRecord {
+  id                String   @id @default(cuid())
+  date              DateTime @default(now())
+  valideurId        String
+  valideur          User     @relation(fields: [valideurId], references: [id])
+  action            String
+  type              String
+  module            String
+  commentaire       String?
+  motifRefus        String?
+  salesRequestId    String?
+  salesRequest      SalesRequest? @relation(fields: [salesRequestId], references: [id])
+  materialRequestId String?
+  materialRequest   MaterialRequest? @relation(fields: [materialRequestId], references: [id])
+  createdAt         DateTime @default(now())
+
+  @@index([salesRequestId])
+  @@index([materialRequestId])
+}
+
+// ---------------------------------------------------------------------------
+// Notifications / audit
+// ---------------------------------------------------------------------------
+
+model Notif {
+  id        String   @id @default(cuid())
+  type      String
+  titre     String
+  msg       String
+  lu        Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
+
+model EmailNotif {
+  id        String   @id @default(cuid())
+  to        String
+  sujet     String
+  corps     String?
+  statut    String   @default("Envoyé")
+  createdAt DateTime @default(now())
+}
+
+model WhatsAppNotif {
+  id        String   @id @default(cuid())
+  to        String
+  msg       String
+  eventType String?
+  category  String?
+  deepLink  String?
+  statut    String?
+  createdAt DateTime @default(now())
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  action    String
+  module    String
+  ref       String?
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id])
+  ip        String?
+  createdAt DateTime @default(now())
+
+  @@index([module, createdAt])
+}
+
+// ---------------------------------------------------------------------------
+// Coûts (photos de coût — voir règle 0.2 du plan : exception au compute-on-read)
+// ---------------------------------------------------------------------------
+
+model ProductCost {
+  id                String   @id @default(cuid())
+  produitId         String   @unique
+  produit           StockItem @relation(fields: [produitId], references: [id])
+  prixVente         Float
+  qteVendue         Float    @default(0)
+  qteProduite       Float    @default(0)
+  qteReel           Float    @default(0)
+  coutMO            Float    @default(0)
+  coutEnergie       Float    @default(0)
+  coutConsommables  Float    @default(0)
+  coutIndirects     Float    @default(0)
+  fraisLogistiques  Float    @default(0)
+  fraisCommerciaux  Float    @default(0)
+  fraisAdmin        Float    @default(0)
+  coutTheoriqueUnit Float    @default(0)
+  calculatedAt      DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  bomLines   ProductCostBomLine[]
+  emballages ProductCostEmballage[]
+}
+
+model ProductCostBomLine {
+  id            String      @id @default(cuid())
+  productCostId String
+  productCost   ProductCost @relation(fields: [productCostId], references: [id], onDelete: Cascade)
+  matiereId     String
+  matiere       StockItem   @relation(fields: [matiereId], references: [id])
+  incorpPct     Float
+  qteKg         Float
+  prixAchat     Float
+
+  @@index([productCostId])
+}
+
+model ProductCostEmballage {
+  id            String      @id @default(cuid())
+  productCostId String
+  productCost   ProductCost @relation(fields: [productCostId], references: [id], onDelete: Cascade)
+  type          String
+  qte           Float
+  prix          Float
+
+  @@index([productCostId])
+}
+
+model MatierePrixStat {
+  id           String   @id @default(cuid())
+  matiereId    String   @unique
+  matiere      StockItem @relation(fields: [matiereId], references: [id])
+  dernierPrix  Float
+  prixMoyen    Float
+  evolutionPct Float    @default(0)
+  updatedAt    DateTime @updatedAt
+}
+
+model CommandeRentabilite {
+  id           String   @id @default(cuid())
+  commandeId   String   @unique
+  commande     Commande @relation(fields: [commandeId], references: [id])
+  montant      Float
+  coutProduits Float
+  marge        Float
+  tauxMarge    Float
+  niveau       String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model VenteSegment {
+  id        String   @id @default(cuid())
+  segment   String   @unique
+  ca        Float
+  pct       Float
+  couleur   String
+  updatedAt DateTime @updatedAt
+}
