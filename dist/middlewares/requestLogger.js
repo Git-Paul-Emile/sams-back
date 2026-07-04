@@ -1,0 +1,4 @@
+import morgan from "morgan";
+const format = process.env.NODE_ENV === "production" ? "combined" : "dev";
+export const requestLogger = morgan(format);
+//# sourceMappingURL=requestLogger.js.map

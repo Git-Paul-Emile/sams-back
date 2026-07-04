@@ -1,0 +1,1 @@
+{"version":3,"file":"search.service.d.ts","sourceRoot":"","sources":["../../src/services/search.service.ts"],"names":[],"mappings":"AAIA,MAAM,WAAW,kBAAkB;IACjC,IAAI,EAAE,QAAQ,GAAG,UAAU,GAAG,SAAS,GAAG,OAAO,CAAC;IAClD,EAAE,EAAE,MAAM,CAAC;IACX,KAAK,EAAE,MAAM,CAAC;IACd,IAAI,EAAE,MAAM,CAAC;CACd;AAED,eAAO,MAAM,aAAa;cACR,MAAM,GAAG,OAAO,CAAC,kBAAkB,EAAE,CAAC;CA+CvD,CAAC"}

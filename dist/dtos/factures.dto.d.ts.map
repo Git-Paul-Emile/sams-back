@@ -1,0 +1,1 @@
+{"version":3,"file":"factures.dto.d.ts","sourceRoot":"","sources":["../../src/dtos/factures.dto.ts"],"names":[],"mappings":"AACA,OAAO,KAAK,EAAE,MAAM,EAAE,UAAU,EAAE,OAAO,EAAE,MAAM,+BAA+B,CAAC;AAEjF,KAAK,UAAU,GAAG,OAAO,GAAG;IAAE,MAAM,EAAE,MAAM,CAAC;IAAC,UAAU,EAAE,UAAU,CAAA;CAAE,CAAC;AAEvE;;;GAGG;AACH,wBAAgB,YAAY,CAAC,OAAO,EAAE,UAAU;;;;;;;;;;;;;;EAgB/C"}

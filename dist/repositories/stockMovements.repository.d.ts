@@ -1,0 +1,286 @@
+import type { Prisma, PrismaClient } from "../generated/prisma/client.js";
+type Client = PrismaClient | Prisma.TransactionClient;
+export declare const stockMovementsRepository: {
+    findMany(where: Prisma.MouvementWhereInput, opts: {
+        skip: number;
+        take: number;
+        orderBy: Prisma.MouvementOrderByWithRelationInput;
+    }): Prisma.PrismaPromise<({
+        user: {
+            id: string;
+            email: string;
+            nom: string;
+            tel: string | null;
+            passwordHash: string;
+            role: import("../generated/prisma/enums.js").Role;
+            statut: string;
+            lastLoginAt: Date | null;
+            createdAt: Date;
+            updatedAt: Date;
+        } | null;
+        commande: {
+            id: string;
+            createdAt: Date;
+            updatedAt: Date;
+            date: Date;
+            commercialId: string;
+            num: string;
+            clientId: string;
+            montant: number;
+            statutActuel: string;
+        } | null;
+        achat: {
+            id: string;
+            statut: string;
+            createdAt: Date;
+            updatedAt: Date;
+            date: Date;
+            num: string;
+            montant: number;
+            fournisseurId: string;
+            livraison: Date;
+            articles: number;
+        } | null;
+        stockItem: {
+            id: string;
+            createdAt: Date;
+            updatedAt: Date;
+            min: number;
+            type: import("../generated/prisma/enums.js").StockItemType;
+            code: string;
+            categorie: string;
+            designation: string;
+            unite: string;
+            stock: number;
+            critique: number;
+            valeurUnit: number;
+        };
+        prodOrder: {
+            id: string;
+            statut: string;
+            createdAt: Date;
+            updatedAt: Date;
+            num: string;
+            produitId: string;
+            ligne: string;
+            qtePrev: number;
+            qteReel: number;
+            debut: Date;
+            fin: Date;
+            responsableId: string | null;
+            rendement: number;
+        } | null;
+        salesRequest: {
+            id: string;
+            statut: string;
+            createdAt: Date;
+            updatedAt: Date;
+            date: Date;
+            commercialId: string;
+            num: string;
+            clientId: string;
+            montant: number;
+            commentaire: string | null;
+            produitId: string;
+            qteDemandee: number;
+            qteValidee: number | null;
+            stockDispo: number | null;
+            prixUnit: number;
+            entrepot: string | null;
+            observation: string | null;
+            valideurId: string | null;
+            dateValidation: Date | null;
+        } | null;
+        materialRequest: {
+            id: string;
+            statut: string;
+            createdAt: Date;
+            updatedAt: Date;
+            date: Date;
+            num: string;
+            prodOrderId: string;
+            qteDemandee: number;
+            qteValidee: number | null;
+            valideurId: string | null;
+            dateValidation: Date | null;
+            operateurId: string | null;
+            ligne: string;
+            matiereId: string;
+            commentaires: string | null;
+            docBC: string | null;
+            docBL: string | null;
+        } | null;
+    } & {
+        id: string;
+        createdAt: Date;
+        userId: string | null;
+        type: string;
+        date: Date;
+        commandeId: string | null;
+        stockItemId: string;
+        qte: number;
+        motif: string | null;
+        achatId: string | null;
+        prodOrderId: string | null;
+        salesRequestId: string | null;
+        materialRequestId: string | null;
+    })[]>;
+    count(where: Prisma.MouvementWhereInput): Prisma.PrismaPromise<number>;
+    /** À utiliser à l'intérieur d'un `prisma.$transaction` piloté par le Service. */
+    findStockItemById(id: string, client?: Client): Prisma.Prisma__StockItemClient<{
+        id: string;
+        createdAt: Date;
+        updatedAt: Date;
+        min: number;
+        type: import("../generated/prisma/enums.js").StockItemType;
+        code: string;
+        categorie: string;
+        designation: string;
+        unite: string;
+        stock: number;
+        critique: number;
+        valeurUnit: number;
+    } | null, null, import("@prisma/client/runtime/client").DefaultArgs, {
+        omit: Prisma.GlobalOmitConfig | undefined;
+    }>;
+    adjustStock(id: string, newStock: number, client?: Client): Prisma.Prisma__StockItemClient<{
+        id: string;
+        createdAt: Date;
+        updatedAt: Date;
+        min: number;
+        type: import("../generated/prisma/enums.js").StockItemType;
+        code: string;
+        categorie: string;
+        designation: string;
+        unite: string;
+        stock: number;
+        critique: number;
+        valeurUnit: number;
+    }, never, import("@prisma/client/runtime/client").DefaultArgs, {
+        omit: Prisma.GlobalOmitConfig | undefined;
+    }>;
+    create(data: Prisma.MouvementUncheckedCreateInput, client?: Client): Prisma.Prisma__MouvementClient<{
+        user: {
+            id: string;
+            email: string;
+            nom: string;
+            tel: string | null;
+            passwordHash: string;
+            role: import("../generated/prisma/enums.js").Role;
+            statut: string;
+            lastLoginAt: Date | null;
+            createdAt: Date;
+            updatedAt: Date;
+        } | null;
+        commande: {
+            id: string;
+            createdAt: Date;
+            updatedAt: Date;
+            date: Date;
+            commercialId: string;
+            num: string;
+            clientId: string;
+            montant: number;
+            statutActuel: string;
+        } | null;
+        achat: {
+            id: string;
+            statut: string;
+            createdAt: Date;
+            updatedAt: Date;
+            date: Date;
+            num: string;
+            montant: number;
+            fournisseurId: string;
+            livraison: Date;
+            articles: number;
+        } | null;
+        stockItem: {
+            id: string;
+            createdAt: Date;
+            updatedAt: Date;
+            min: number;
+            type: import("../generated/prisma/enums.js").StockItemType;
+            code: string;
+            categorie: string;
+            designation: string;
+            unite: string;
+            stock: number;
+            critique: number;
+            valeurUnit: number;
+        };
+        prodOrder: {
+            id: string;
+            statut: string;
+            createdAt: Date;
+            updatedAt: Date;
+            num: string;
+            produitId: string;
+            ligne: string;
+            qtePrev: number;
+            qteReel: number;
+            debut: Date;
+            fin: Date;
+            responsableId: string | null;
+            rendement: number;
+        } | null;
+        salesRequest: {
+            id: string;
+            statut: string;
+            createdAt: Date;
+            updatedAt: Date;
+            date: Date;
+            commercialId: string;
+            num: string;
+            clientId: string;
+            montant: number;
+            commentaire: string | null;
+            produitId: string;
+            qteDemandee: number;
+            qteValidee: number | null;
+            stockDispo: number | null;
+            prixUnit: number;
+            entrepot: string | null;
+            observation: string | null;
+            valideurId: string | null;
+            dateValidation: Date | null;
+        } | null;
+        materialRequest: {
+            id: string;
+            statut: string;
+            createdAt: Date;
+            updatedAt: Date;
+            date: Date;
+            num: string;
+            prodOrderId: string;
+            qteDemandee: number;
+            qteValidee: number | null;
+            valideurId: string | null;
+            dateValidation: Date | null;
+            operateurId: string | null;
+            ligne: string;
+            matiereId: string;
+            commentaires: string | null;
+            docBC: string | null;
+            docBL: string | null;
+        } | null;
+    } & {
+        id: string;
+        createdAt: Date;
+        userId: string | null;
+        type: string;
+        date: Date;
+        commandeId: string | null;
+        stockItemId: string;
+        qte: number;
+        motif: string | null;
+        achatId: string | null;
+        prodOrderId: string | null;
+        salesRequestId: string | null;
+        materialRequestId: string | null;
+    }, never, import("@prisma/client/runtime/client").DefaultArgs, {
+        omit: Prisma.GlobalOmitConfig | undefined;
+    }>;
+};
+export {};
+//# sourceMappingURL=stockMovements.repository.d.ts.map

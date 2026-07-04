@@ -1,0 +1,1 @@
+{"version":3,"file":"incidents.dto.d.ts","sourceRoot":"","sources":["../../src/dtos/incidents.dto.ts"],"names":[],"mappings":"AAAA,OAAO,KAAK,EAAE,QAAQ,EAAE,SAAS,EAAE,SAAS,EAAE,MAAM,+BAA+B,CAAC;AAEpF,KAAK,qBAAqB,GAAG,QAAQ,GAAG;IACtC,SAAS,EAAE,SAAS,CAAC;IACrB,SAAS,EAAE,SAAS,GAAG,IAAI,CAAC;CAC7B,CAAC;AAEF,wFAAwF;AACxF,wBAAgB,aAAa,CAAC,QAAQ,EAAE,qBAAqB;;;;;;;;;EAW5D"}

@@ -1,0 +1,1 @@
+{"version":3,"file":"prodOrders.dto.d.ts","sourceRoot":"","sources":["../../src/dtos/prodOrders.dto.ts"],"names":[],"mappings":"AACA,OAAO,KAAK,EAAE,SAAS,EAAE,SAAS,EAAE,SAAS,EAAE,MAAM,+BAA+B,CAAC;AAErF,KAAK,sBAAsB,GAAG,SAAS,GAAG;IACxC,OAAO,EAAE,SAAS,CAAC;IACnB,WAAW,EAAE,SAAS,GAAG,IAAI,CAAC;CAC/B,CAAC;AAEF,yFAAyF;AACzF,wBAAgB,cAAc,CAAC,KAAK,EAAE,sBAAsB;;;;;;;;;;;;EAc3D"}

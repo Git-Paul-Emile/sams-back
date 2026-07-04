@@ -1,0 +1,1 @@
+{"version":3,"file":"emailNotifs.dto.js","sourceRoot":"","sources":["../../src/dtos/emailNotifs.dto.ts"],"names":[],"mappings":"AAEA,MAAM,UAAU,eAAe,CAAC,GAAe;IAC7C,OAAO;QACL,EAAE,EAAE,GAAG,CAAC,EAAE;QACV,EAAE,EAAE,GAAG,CAAC,EAAE;QACV,KAAK,EAAE,GAAG,CAAC,KAAK;QAChB,KAAK,EAAE,GAAG,CAAC,SAAS,CAAC,WAAW,EAAE;QAClC,MAAM,EAAE,GAAG,CAAC,MAAM;KACnB,CAAC;AACJ,CAAC"}

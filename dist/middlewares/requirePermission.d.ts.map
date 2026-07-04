@@ -1,0 +1,1 @@
+{"version":3,"file":"requirePermission.d.ts","sourceRoot":"","sources":["../../src/middlewares/requirePermission.ts"],"names":[],"mappings":"AAAA,OAAO,KAAK,EAAE,YAAY,EAAE,OAAO,EAAE,QAAQ,EAAE,MAAM,SAAS,CAAC;AAkB/D,eAAO,MAAM,iBAAiB,GAAI,YAAY,MAAM,MAAY,KAAK,OAAO,EAAE,KAAK,QAAQ,EAAE,MAAM,YAAY,kBAS9G,CAAC"}

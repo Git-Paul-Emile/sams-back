@@ -1,0 +1,12 @@
+import { controllerWrapper } from "../utils/controllerWapper.js";
+import { jsonResponse } from "../utils/responseApi.js";
+import { settingsService } from "../services/settings.service.js";
+export const getSettings = controllerWrapper(async (req, res) => {
+    const settings = await settingsService.get();
+    res.json(jsonResponse({ status: "success", message: "OK", data: settings }));
+});
+export const updateSettings = controllerWrapper(async (req, res) => {
+    const settings = await settingsService.update(req.body, { userId: req.user.id, ip: req.ip });
+    res.json(jsonResponse({ status: "success", message: "Paramètres mis à jour", data: settings }));
+});
+//# sourceMappingURL=settings.controller.js.map

@@ -1,0 +1,1 @@
+{"version":3,"file":"settings.dto.js","sourceRoot":"","sources":["../../src/dtos/settings.dto.ts"],"names":[],"mappings":"AAEA,MAAM,UAAU,aAAa,CAAC,QAAkB;IAC9C,OAAO;QACL,eAAe,EAAE,QAAQ,CAAC,eAAe;QACzC,iBAAiB,EAAE,QAAQ,CAAC,iBAAiB;QAC7C,oBAAoB,EAAE,QAAQ,CAAC,oBAAoB;QACnD,mBAAmB,EAAE,QAAQ,CAAC,mBAAmB;QACjD,sBAAsB,EAAE,QAAQ,CAAC,sBAAsB;KACxD,CAAC;AACJ,CAAC"}

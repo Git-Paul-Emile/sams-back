@@ -1,0 +1,1 @@
+{"version":3,"file":"permissions.dto.js","sourceRoot":"","sources":["../../src/dtos/permissions.dto.ts"],"names":[],"mappings":"AAEA,yGAAyG;AACzG,MAAM,UAAU,eAAe,CAAC,cAA8B;IAC5D,OAAO;QACL,EAAE,EAAE,cAAc,CAAC,IAAI;QACvB,IAAI,EAAE,cAAc,CAAC,IAAI;QACzB,OAAO,EAAE,cAAc,CAAC,OAAO;KAChC,CAAC;AACJ,CAAC"}
