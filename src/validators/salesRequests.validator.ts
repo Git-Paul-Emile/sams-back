@@ -23,6 +23,7 @@ export const listSalesRequestsQuerySchema = z.object({
   page: z.coerce.number().int().positive().optional(),
   pageSize: z.coerce.number().int().positive().optional(),
   statut: z.string().optional(),
+  search: z.string().optional(),
 });
 
 export type CreateSalesRequestInput = z.infer<typeof createSalesRequestSchema>;

@@ -19,6 +19,14 @@ export const facturesService = {
     const where: Prisma.FactureWhereInput = {
       ...(query.statut ? { statut: query.statut } : {}),
       ...(query.clientId ? { clientId: query.clientId } : {}),
+      ...(query.search
+        ? {
+            OR: [
+              { num: { contains: query.search, mode: "insensitive" } },
+              { client: { raison: { contains: query.search, mode: "insensitive" } } },
+            ],
+          }
+        : {}),
     };
     const orderBy: Prisma.FactureOrderByWithRelationInput = { date: "desc" };
 

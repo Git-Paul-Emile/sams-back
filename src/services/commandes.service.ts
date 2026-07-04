@@ -19,6 +19,14 @@ export const commandesService = {
     const where: Prisma.CommandeWhereInput = {
       ...(query.statutActuel ? { statutActuel: query.statutActuel } : {}),
       ...(query.clientId ? { clientId: query.clientId } : {}),
+      ...(query.search
+        ? {
+            OR: [
+              { num: { contains: query.search, mode: "insensitive" } },
+              { client: { raison: { contains: query.search, mode: "insensitive" } } },
+            ],
+          }
+        : {}),
     };
     const orderBy: Prisma.CommandeOrderByWithRelationInput = { date: "desc" };
 

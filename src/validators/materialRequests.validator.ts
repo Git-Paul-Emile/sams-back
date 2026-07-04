@@ -22,6 +22,7 @@ export const listMaterialRequestsQuerySchema = z.object({
   page: z.coerce.number().int().positive().optional(),
   pageSize: z.coerce.number().int().positive().optional(),
   statut: z.string().optional(),
+  search: z.string().optional(),
 });
 
 export type CreateMaterialRequestInput = z.infer<typeof createMaterialRequestSchema>;

@@ -17,6 +17,7 @@ export const listCommandesQuerySchema = z.object({
   pageSize: z.coerce.number().int().positive().optional(),
   statutActuel: z.enum(COMMANDE_ETATS).optional(),
   clientId: z.string().optional(),
+  search: z.string().optional(),
 });
 
 export type CreateCommandeInput = z.infer<typeof createCommandeSchema>;

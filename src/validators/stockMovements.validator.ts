@@ -27,6 +27,7 @@ export const listMouvementsQuerySchema = z.object({
   pageSize: z.coerce.number().int().positive().optional(),
   stockItemId: z.string().optional(),
   type: z.string().optional(),
+  search: z.string().optional(),
 });
 
 export type CreateMouvementInput = z.infer<typeof createMouvementSchema>;

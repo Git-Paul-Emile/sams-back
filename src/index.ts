@@ -1,6 +1,8 @@
+import http from "node:http";
 import dotenv from "dotenv";
 import { connectToDatabase } from "./config/database.js";
 import app from "./config/app.js";
+import { initSocketServer } from "./realtime/socketServer.js";
 
 
 
@@ -16,7 +18,9 @@ const initializeApp = async () => {
    await connectToDatabase();
 
    const PORT = process.env.PORT || 8000;
-   app.listen(PORT, () => {
+   const server = http.createServer(app);
+   initSocketServer(server);
+   server.listen(PORT, () => {
      console.log(`✅ Serveur démarré sur http://localhost:${PORT}`);
    });
  } catch (err) {

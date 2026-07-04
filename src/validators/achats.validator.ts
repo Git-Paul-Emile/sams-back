@@ -12,6 +12,7 @@ export const listAchatsQuerySchema = z.object({
   page: z.coerce.number().int().positive().optional(),
   pageSize: z.coerce.number().int().positive().optional(),
   statut: z.enum(ACHAT_STATUTS).optional(),
+  search: z.string().optional(),
 });
 
 export type CreateAchatInput = z.infer<typeof createAchatSchema>;

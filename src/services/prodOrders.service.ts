@@ -23,6 +23,17 @@ export const prodOrdersService = {
     const where: Prisma.ProdOrderWhereInput = {
       ...(query.statut ? { statut: query.statut } : {}),
       ...(query.ligne ? { ligne: query.ligne } : {}),
+      ...(query.search
+        ? {
+            OR: [
+              { num: { contains: query.search, mode: "insensitive" } },
+              { ligne: { contains: query.search, mode: "insensitive" } },
+              { produit: { designation: { contains: query.search, mode: "insensitive" } } },
+              { responsable: { nom: { contains: query.search, mode: "insensitive" } } },
+              { responsable: { prenom: { contains: query.search, mode: "insensitive" } } },
+            ],
+          }
+        : {}),
     };
 
     const [rows, total] = await Promise.all([

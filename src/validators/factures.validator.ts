@@ -19,6 +19,7 @@ export const listFacturesQuerySchema = z.object({
   pageSize: z.coerce.number().int().positive().optional(),
   statut: z.enum(FACTURE_STATUTS).optional(),
   clientId: z.string().optional(),
+  search: z.string().optional(),
 });
 
 export type CreateFactureInput = z.infer<typeof createFactureSchema>;

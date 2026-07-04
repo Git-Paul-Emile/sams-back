@@ -1,6 +1,7 @@
 import { prisma } from "../config/database.js";
 import { getEmailProvider } from "./external/email/emailProviderFactory.js";
 import { getWhatsAppProvider } from "./external/whatsapp/whatsappProviderFactory.js";
+import { emitNotifCreated } from "../realtime/socketServer.js";
 
 export type WhatsAppCategory = "authorization" | "information";
 
@@ -79,9 +80,10 @@ export const notificationService = {
         );
       }
 
-      await prisma.notif.create({
+      const notif = await prisma.notif.create({
         data: { type: input.eventType, titre: input.title, msg: input.lines.join(" "), lu: false },
       });
+      emitNotifCreated(notif);
     } catch (error) {
       console.error("[notificationService] Échec de notification Direction", error);
     }

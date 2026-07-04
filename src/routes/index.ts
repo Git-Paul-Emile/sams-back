@@ -26,6 +26,7 @@ import emailNotifsRoutes from "./emailNotifs.routes.js";
 import whatsappNotifsRoutes from "./whatsappNotifs.routes.js";
 import auditLogRoutes from "./auditLog.routes.js";
 import financeRoutes from "./finance.routes.js";
+import searchRoutes from "./search.routes.js";
 
 /**
  * Point de montage unique de toutes les routes `/api/v1/*`. Chaque feature
@@ -60,4 +61,5 @@ export function mountRoutes(app: Express): void {
   app.use("/api/v1/whatsapp-notifs", whatsappNotifsRoutes);
   app.use("/api/v1/audit-log", auditLogRoutes);
   app.use("/api/v1/finance", financeRoutes);
+  app.use("/api/v1/search", searchRoutes);
 }

@@ -22,9 +22,20 @@ interface ActionContext {
 const PENDING_STATUT = "En attente de validation";
 
 export const materialRequestsService = {
-  async list(query: { page?: number; pageSize?: number; statut?: string }) {
+  async list(query: { page?: number; pageSize?: number; statut?: string; search?: string }) {
     const { page, pageSize, skip, take } = parsePagination(query);
-    const where: Prisma.MaterialRequestWhereInput = query.statut ? { statut: query.statut } : {};
+    const where: Prisma.MaterialRequestWhereInput = {
+      ...(query.statut ? { statut: query.statut } : {}),
+      ...(query.search
+        ? {
+            OR: [
+              { num: { contains: query.search, mode: "insensitive" } },
+              { matiere: { designation: { contains: query.search, mode: "insensitive" } } },
+              { prodOrder: { num: { contains: query.search, mode: "insensitive" } } },
+            ],
+          }
+        : {}),
+    };
     const [rows, total] = await Promise.all([
       materialRequestsRepository.findMany(where, { skip, take }),
       materialRequestsRepository.count(where),

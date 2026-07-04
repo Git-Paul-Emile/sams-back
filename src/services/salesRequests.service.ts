@@ -18,9 +18,21 @@ interface ActionContext {
 const PENDING_STATUT = "En attente de validation";
 
 export const salesRequestsService = {
-  async list(query: { page?: number; pageSize?: number; statut?: string }) {
+  async list(query: { page?: number; pageSize?: number; statut?: string; search?: string }) {
     const { page, pageSize, skip, take } = parsePagination(query);
-    const where: Prisma.SalesRequestWhereInput = query.statut ? { statut: query.statut } : {};
+    const where: Prisma.SalesRequestWhereInput = {
+      ...(query.statut ? { statut: query.statut } : {}),
+      ...(query.search
+        ? {
+            OR: [
+              { num: { contains: query.search, mode: "insensitive" } },
+              { client: { raison: { contains: query.search, mode: "insensitive" } } },
+              { commercial: { nom: { contains: query.search, mode: "insensitive" } } },
+              { produit: { designation: { contains: query.search, mode: "insensitive" } } },
+            ],
+          }
+        : {}),
+    };
     const [rows, total] = await Promise.all([
       salesRequestsRepository.findMany(where, { skip, take }),
       salesRequestsRepository.count(where),

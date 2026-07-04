@@ -17,6 +17,16 @@ export const incidentsService = {
     const { page, pageSize, skip, take } = parsePagination(query);
     const where: Prisma.IncidentWhereInput = {
       ...(query.statut ? { statut: query.statut } : {}),
+      ...(query.search
+        ? {
+            OR: [
+              { description: { contains: query.search, mode: "insensitive" } },
+              { categorie: { contains: query.search, mode: "insensitive" } },
+              { operateur: { nom: { contains: query.search, mode: "insensitive" } } },
+              { prodOrder: { num: { contains: query.search, mode: "insensitive" } } },
+            ],
+          }
+        : {}),
     };
 
     const [rows, total] = await Promise.all([

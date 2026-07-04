@@ -12,6 +12,7 @@ export const listIncidentsQuerySchema = z.object({
   page: z.coerce.number().int().positive().optional(),
   pageSize: z.coerce.number().int().positive().optional(),
   statut: z.string().optional(),
+  search: z.string().optional(),
 });
 
 export type CreateIncidentInput = z.infer<typeof createIncidentSchema>;

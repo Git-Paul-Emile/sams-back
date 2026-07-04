@@ -9,6 +9,16 @@ export const auditLogService = {
     const { page, pageSize, skip, take } = parsePagination(query);
     const where: Prisma.AuditLogWhereInput = {
       ...(query.module ? { module: query.module } : {}),
+      ...(query.search
+        ? {
+            OR: [
+              { action: { contains: query.search, mode: "insensitive" } },
+              { ref: { contains: query.search, mode: "insensitive" } },
+              { ip: { contains: query.search, mode: "insensitive" } },
+              { user: { nom: { contains: query.search, mode: "insensitive" } } },
+            ],
+          }
+        : {}),
     };
 
     const [rows, total] = await Promise.all([

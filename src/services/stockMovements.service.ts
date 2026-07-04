@@ -19,6 +19,15 @@ export const stockMovementsService = {
     const where: Prisma.MouvementWhereInput = {
       ...(query.stockItemId ? { stockItemId: query.stockItemId } : {}),
       ...(query.type ? { type: query.type } : {}),
+      ...(query.search
+        ? {
+            OR: [
+              { stockItem: { designation: { contains: query.search, mode: "insensitive" } } },
+              { motif: { contains: query.search, mode: "insensitive" } },
+              { user: { nom: { contains: query.search, mode: "insensitive" } } },
+            ],
+          }
+        : {}),
     };
 
     const [rows, total] = await Promise.all([

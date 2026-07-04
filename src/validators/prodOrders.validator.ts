@@ -15,6 +15,7 @@ export const listProdOrdersQuerySchema = z.object({
   pageSize: z.coerce.number().int().positive().optional(),
   statut: prodOrderStatutSchema.optional(),
   ligne: z.string().optional(),
+  search: z.string().optional(),
 });
 
 export type CreateProdOrderInput = z.infer<typeof createProdOrderSchema>;

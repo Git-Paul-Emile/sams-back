@@ -3,6 +3,7 @@ import { notificationsRepository } from "../repositories/notifications.repositor
 import { toNotifDto } from "../dtos/notifications.dto.js";
 import { AppError } from "../utils/AppError.js";
 import { parsePagination } from "../utils/pagination.js";
+import { emitNotifCreated } from "../realtime/socketServer.js";
 import type { CreateNotifInput, ListNotifsQuery } from "../validators/notifications.validator.js";
 
 export const notificationsService = {
@@ -17,7 +18,9 @@ export const notificationsService = {
 
   async create(input: CreateNotifInput) {
     const created = await notificationsRepository.create({ ...input, lu: false });
-    return toNotifDto(created);
+    const dto = toNotifDto(created);
+    emitNotifCreated(dto);
+    return dto;
   },
 
   async markAsRead(id: string) {

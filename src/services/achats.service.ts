@@ -18,6 +18,14 @@ export const achatsService = {
     const { page, pageSize, skip, take } = parsePagination(query);
     const where: Prisma.AchatWhereInput = {
       ...(query.statut ? { statut: query.statut } : {}),
+      ...(query.search
+        ? {
+            OR: [
+              { num: { contains: query.search, mode: "insensitive" } },
+              { fournisseur: { nom: { contains: query.search, mode: "insensitive" } } },
+            ],
+          }
+        : {}),
     };
     const orderBy: Prisma.AchatOrderByWithRelationInput = { date: "desc" };
 
