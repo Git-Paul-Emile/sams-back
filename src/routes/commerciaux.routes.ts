@@ -2,6 +2,7 @@ import { Router } from "express";
 import {
   createCommercial,
   getCommercial,
+  importCommerciaux,
   listCommerciaux,
   updateCommercial,
 } from "../controllers/commerciaux.controller.js";
@@ -11,6 +12,7 @@ import {
   listCommerciauxQuerySchema,
   updateCommercialSchema,
 } from "../validators/commerciaux.validator.js";
+import { importEnvelopeSchema } from "../validators/import.validator.js";
 import { requireAuth } from "../middlewares/requireAuth.js";
 import { requirePermission } from "../middlewares/requirePermission.js";
 import { validateId } from "../middlewares/validateId.js";
@@ -22,6 +24,7 @@ router.use(requireAuth, requirePermission("Admin"));
 router.get("/", validateQuery(listCommerciauxQuerySchema), listCommerciaux);
 router.get("/:id", validateId, getCommercial);
 router.post("/", validateBody(createCommercialSchema), createCommercial);
+router.post("/import", validateBody(importEnvelopeSchema), importCommerciaux);
 router.patch("/:id", validateId, validateBody(updateCommercialSchema), updateCommercial);
 
 export default router;

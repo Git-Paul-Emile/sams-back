@@ -25,3 +25,13 @@ export const authRateLimiter = rateLimit({
   legacyHeaders: false,
   handler: rateLimitHandler,
 });
+
+// Encore plus stricte que authRateLimiter : demander/vérifier un OTP coûte un
+// envoi SMS/WhatsApp réel une fois un fournisseur de production branché.
+export const otpRateLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  limit: 5,
+  standardHeaders: true,
+  legacyHeaders: false,
+  handler: rateLimitHandler,
+});

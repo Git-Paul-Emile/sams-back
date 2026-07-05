@@ -2,7 +2,9 @@ import type { Request, Response } from "express";
 import { controllerWrapper } from "../utils/controllerWapper.js";
 import { jsonResponse } from "../utils/responseApi.js";
 import { setPaginationHeaders } from "../utils/pagination.js";
+import { importRows } from "../utils/bulkImport.js";
 import { clientsService } from "../services/clients.service.js";
+import { createClientSchema } from "../validators/clients.validator.js";
 
 export const listClients = controllerWrapper(async (req: Request, res: Response) => {
   const { items, total, page, pageSize } = await clientsService.list(req.query as never);
@@ -23,4 +25,10 @@ export const createClient = controllerWrapper(async (req: Request, res: Response
 export const updateClient = controllerWrapper(async (req: Request, res: Response) => {
   const client = await clientsService.update(req.params.id as string, req.body, { userId: req.user!.id, ip: req.ip });
   res.json(jsonResponse({ status: "success", message: "Client mis à jour", data: client }));
+});
+
+export const importClients = controllerWrapper(async (req: Request, res: Response) => {
+  const ctx = { userId: req.user!.id, ip: req.ip };
+  const report = await importRows(req.body.rows, createClientSchema, (row) => clientsService.create(row, ctx));
+  res.json(jsonResponse({ status: "success", message: "Import terminé", data: report }));
 });

@@ -1,12 +1,17 @@
 import { z } from "zod";
 import { ACTIVE_STATUTS, roleSchema } from "./enums.js";
 
-export const createUserSchema = z.object({
-  nom: z.string().min(1, "Nom requis"),
-  email: z.string().email("Email invalide"),
-  role: roleSchema,
-  tel: z.string().optional(),
-});
+export const createUserSchema = z
+  .object({
+    nom: z.string().min(1, "Nom requis"),
+    email: z.string().email("Email invalide").optional(),
+    role: roleSchema,
+    tel: z.string().optional(),
+  })
+  .refine((data) => Boolean(data.email) || Boolean(data.tel), {
+    message: "Email ou téléphone requis",
+    path: ["email"],
+  });
 
 export const updateUserSchema = z.object({
   nom: z.string().min(1).optional(),

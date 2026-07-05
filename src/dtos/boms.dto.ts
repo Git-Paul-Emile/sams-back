@@ -9,8 +9,11 @@ type BomWithRelations = Bom & {
 export function toBomDto(bom: BomWithRelations) {
   return {
     id: bom.id,
+    produitId: bom.produit.id,
     produit: bom.produit.designation,
     items: bom.items.map((line) => ({
+      id: line.id,
+      matiereId: line.matiere.id,
       intrant: line.matiere.designation,
       categorie: line.matiere.categorie,
       qte: line.qte,

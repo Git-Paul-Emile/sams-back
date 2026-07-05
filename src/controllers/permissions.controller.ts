@@ -8,6 +8,11 @@ export const listPermissions = controllerWrapper(async (req: Request, res: Respo
   res.json(jsonResponse({ status: "success", message: "OK", data: items }));
 });
 
+export const listPermissionModules = controllerWrapper(async (req: Request, res: Response) => {
+  const modules = permissionsService.listModules();
+  res.json(jsonResponse({ status: "success", message: "OK", data: modules }));
+});
+
 export const updatePermission = controllerWrapper(async (req: Request, res: Response) => {
   const updated = await permissionsService.update(req.params.role as string, req.body, {
     userId: req.user!.id,

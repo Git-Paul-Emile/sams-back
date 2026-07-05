@@ -4,6 +4,8 @@ import { toPermissionDto } from "../dtos/permissions.dto.js";
 import { AppError } from "../utils/AppError.js";
 import { recordAuditLog } from "../utils/auditLog.js";
 import { roleSchema } from "../validators/enums.js";
+import { MODULES } from "../constants/modules.js";
+import { invalidatePermissionCache } from "../middlewares/requirePermission.js";
 import type { UpdatePermissionInput } from "../validators/permissions.validator.js";
 
 interface ActionContext {
@@ -17,6 +19,10 @@ export const permissionsService = {
     return rows.map(toPermissionDto);
   },
 
+  listModules() {
+    return MODULES;
+  },
+
   async update(role: string, input: UpdatePermissionInput, ctx: ActionContext) {
     const parsedRole = roleSchema.safeParse(role);
     if (!parsedRole.success) {
@@ -27,6 +33,7 @@ export const permissionsService = {
     if (!existing) throw new AppError("Permissions introuvables pour ce rôle", StatusCodes.NOT_FOUND);
 
     const updated = await permissionsRepository.update(parsedRole.data, { modules: input.modules });
+    invalidatePermissionCache(parsedRole.data);
     await recordAuditLog({
       action: "Modification",
       module: "Admin",

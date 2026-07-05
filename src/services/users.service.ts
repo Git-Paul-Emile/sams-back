@@ -47,10 +47,12 @@ export const usersService = {
   },
 
   async create(input: CreateUserInput, ctx: ActionContext) {
-    // Mot de passe temporaire aléatoire (12 caractères, alphabet base64url —
-    // sûr pour JSON/affichage), généré et hashé côté serveur.
-    const tempPassword = crypto.randomBytes(9).toString("base64url");
-    const passwordHash = await bcrypt.hash(tempPassword, SALT_ROUNDS);
+    // Un compte avec seulement un téléphone n'a pas de mot de passe : son premier
+    // accès se fait par OTP (voir services/otp.service.ts). Mot de passe temporaire
+    // aléatoire (12 caractères, alphabet base64url — sûr pour JSON/affichage),
+    // généré et hashé côté serveur, uniquement quand un email est fourni.
+    const tempPassword = input.email ? crypto.randomBytes(9).toString("base64url") : null;
+    const passwordHash = tempPassword ? await bcrypt.hash(tempPassword, SALT_ROUNDS) : null;
 
     const created = await usersRepository.create({
       nom: input.nom,
@@ -61,10 +63,18 @@ export const usersService = {
       statut: "Actif",
     });
 
-    // TODO: envoyer par email via EmailProvider une fois disponible (voir services/external/email)
-    console.log(`[users] Mot de passe temporaire pour ${created.email}: ${tempPassword}`);
+    if (tempPassword) {
+      // TODO: envoyer par email via EmailProvider une fois disponible (voir services/external/email)
+      console.log(`[users] Mot de passe temporaire pour ${created.email}: ${tempPassword}`);
+    }
 
-    await recordAuditLog({ action: "Création", module: "Admin", ref: created.email, userId: ctx.userId, ip: ctx.ip });
+    await recordAuditLog({
+      action: "Création",
+      module: "Admin",
+      ref: created.email ?? created.tel ?? created.id,
+      userId: ctx.userId,
+      ip: ctx.ip,
+    });
     return toUserDto(created);
   },
 

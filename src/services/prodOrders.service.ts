@@ -1,5 +1,6 @@
 import { StatusCodes } from "http-status-codes";
 import { prodOrdersRepository } from "../repositories/prodOrders.repository.js";
+import { bomsRepository } from "../repositories/boms.repository.js";
 import { toProdOrderDto } from "../dtos/prodOrders.dto.js";
 import { AppError } from "../utils/AppError.js";
 import { parsePagination } from "../utils/pagination.js";
@@ -51,6 +52,14 @@ export const prodOrdersService = {
   },
 
   async create(input: CreateProdOrderInput, ctx: ActionContext) {
+    const bom = await bomsRepository.findByProduitId(input.produitId);
+    if (!bom) {
+      throw new AppError(
+        "Aucune formule (BOM) n'existe pour ce produit. Créez-la avant de lancer un ordre de fabrication.",
+        StatusCodes.UNPROCESSABLE_ENTITY
+      );
+    }
+
     const created = await createWithSequenceNumber(
       "OF",
       (likePrefix) => prodOrdersRepository.countByNumPrefix(likePrefix),

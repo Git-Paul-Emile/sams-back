@@ -20,3 +20,12 @@ export const whatsappConfig = {
   sandboxNumber: () => requireEnv("WHATSAPP_SANDBOX_NUMBER"),
   maxSandboxMessages: () => Number(process.env.WHATSAPP_MAX_SANDBOX_MESSAGES ?? "200"),
 };
+
+// "dev" par défaut : aucun fournisseur SMS/WhatsApp de production n'est encore
+// configuré, le code OTP est loggé côté serveur. Basculer sur "whatsapp" une
+// fois un compte 360dialog de production disponible (voir WhatsAppOtpProvider).
+export const otpConfig = {
+  provider: process.env.OTP_PROVIDER ?? "dev",
+  ttlMs: () => Number(process.env.OTP_TTL_MS ?? "300000"),
+  codeLength: () => Number(process.env.OTP_CODE_LENGTH ?? "6"),
+};

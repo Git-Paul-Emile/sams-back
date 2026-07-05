@@ -7,7 +7,7 @@ const REFRESH_COOKIE_NAME = "refreshToken";
 const REFRESH_COOKIE_PATH = "/api/v1/auth";
 const REFRESH_COOKIE_MAX_AGE_MS = 7 * 24 * 60 * 60 * 1000;
 
-function setRefreshCookie(res: Response, token: string): void {
+export function setRefreshCookie(res: Response, token: string): void {
   const isProduction = process.env.NODE_ENV === "production";
   res.cookie(REFRESH_COOKIE_NAME, token, {
     httpOnly: true,

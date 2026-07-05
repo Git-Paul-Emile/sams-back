@@ -1,7 +1,8 @@
 import { Router } from "express";
-import { createUser, getUser, listUsers, updateUser } from "../controllers/users.controller.js";
+import { createUser, getUser, importUsers, listUsers, updateUser } from "../controllers/users.controller.js";
 import { validateBody, validateQuery } from "../middlewares/validate.js";
 import { createUserSchema, listUsersQuerySchema, updateUserSchema } from "../validators/users.validator.js";
+import { importEnvelopeSchema } from "../validators/import.validator.js";
 import { requireAuth } from "../middlewares/requireAuth.js";
 import { requirePermission } from "../middlewares/requirePermission.js";
 import { validateId } from "../middlewares/validateId.js";
@@ -14,6 +15,7 @@ router.use(requireAuth, requirePermission("Admin"));
 router.get("/", validateQuery(listUsersQuerySchema), listUsers);
 router.get("/:id", validateId, getUser);
 router.post("/", validateBody(createUserSchema), createUser);
+router.post("/import", validateBody(importEnvelopeSchema), importUsers);
 router.patch("/:id", validateId, validateBody(updateUserSchema), updateUser);
 
 export default router;

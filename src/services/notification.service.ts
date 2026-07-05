@@ -67,16 +67,18 @@ export const notificationService = {
       if (emailAllowed) {
         const email = getEmailProvider();
         await Promise.all(
-          directionUsers.map(async (user) => {
-            const result = await email.send({
-              to: user.email,
-              subject: input.title,
-              html: `<p>${input.lines.join("<br/>")}</p><p><a href="${deepLink}">${input.linkLabel}</a></p>`,
-            });
-            await prisma.emailNotif.create({
-              data: { to: user.email, sujet: input.title, statut: result.success ? "Envoyé" : "Échec" },
-            });
-          })
+          directionUsers
+            .filter((u) => u.email)
+            .map(async (user) => {
+              const result = await email.send({
+                to: user.email!,
+                subject: input.title,
+                html: `<p>${input.lines.join("<br/>")}</p><p><a href="${deepLink}">${input.linkLabel}</a></p>`,
+              });
+              await prisma.emailNotif.create({
+                data: { to: user.email!, sujet: input.title, statut: result.success ? "Envoyé" : "Échec" },
+              });
+            })
         );
       }
 

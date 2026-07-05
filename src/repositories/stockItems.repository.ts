@@ -20,4 +20,12 @@ export const stockItemsRepository = {
   updateStock(id: string, stock: number) {
     return prisma.stockItem.update({ where: { id }, data: { stock } });
   },
+
+  countByType(type: Prisma.StockItemWhereInput["type"]) {
+    return prisma.stockItem.count({ where: { type } });
+  },
+
+  create(data: Prisma.StockItemUncheckedCreateInput) {
+    return prisma.stockItem.create({ data });
+  },
 };

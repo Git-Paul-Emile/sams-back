@@ -8,11 +8,11 @@ import { computeInitials } from "../utils/initials.js";
 
 const REFRESH_TOKEN_TTL_MS = 7 * 24 * 60 * 60 * 1000;
 
-function hashToken(raw: string): string {
+export function hashToken(raw: string): string {
   return crypto.createHash("sha256").update(raw).digest("hex");
 }
 
-async function buildUserPayload(userId: string, nom: string, email: string, role: string) {
+export async function buildUserPayload(userId: string, nom: string, email: string | null, role: string) {
   const permission = await authRepository.findModulesForRole(role);
   return {
     id: userId,
@@ -24,7 +24,7 @@ async function buildUserPayload(userId: string, nom: string, email: string, role
   };
 }
 
-async function issueRefreshToken(userId: string): Promise<string> {
+export async function issueRefreshToken(userId: string): Promise<string> {
   const jti = crypto.randomUUID();
   const refreshJwt = generateRefreshToken({ sub: userId, jti });
   await authRepository.createRefreshToken({
@@ -38,7 +38,9 @@ async function issueRefreshToken(userId: string): Promise<string> {
 export const authService = {
   async login(email: string, password: string) {
     const user = await authRepository.findUserByEmail(email);
-    if (!user || !(await bcrypt.compare(password, user.passwordHash))) {
+    // `passwordHash` est null pour les comptes créés sans email (OTP-only, voir chantier E) :
+    // ce login classique doit rester refusé pour eux, avec le même message générique.
+    if (!user || !user.passwordHash || !(await bcrypt.compare(password, user.passwordHash))) {
       throw new AppError("Identifiant ou mot de passe incorrect", StatusCodes.UNAUTHORIZED);
     }
     if (user.statut !== "Actif") {

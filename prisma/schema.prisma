@@ -24,6 +24,11 @@ enum StockItemType {
   PRODUIT
 }
 
+enum OtpPurpose {
+  LOGIN
+  SIGNUP
+}
+
 // ---------------------------------------------------------------------------
 // Auth / RBAC
 // ---------------------------------------------------------------------------
@@ -31,9 +36,9 @@ enum StockItemType {
 model User {
   id           String    @id @default(cuid())
   nom          String
-  email        String    @unique
-  tel          String?
-  passwordHash String
+  email        String?   @unique
+  tel          String?   @unique
+  passwordHash String?
   role         Role
   statut       String    @default("Actif")
   lastLoginAt  DateTime?
@@ -61,6 +66,20 @@ model RefreshToken {
   createdAt DateTime  @default(now())
 
   @@index([userId])
+}
+
+model OtpCode {
+  id          String     @id @default(cuid())
+  tel         String
+  codeHash    String
+  purpose     OtpPurpose
+  expiresAt   DateTime
+  attempts    Int        @default(0)
+  maxAttempts Int        @default(5)
+  consumedAt  DateTime?
+  createdAt   DateTime   @default(now())
+
+  @@index([tel, purpose])
 }
 
 model RolePermission {

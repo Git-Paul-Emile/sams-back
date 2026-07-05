@@ -21,6 +21,10 @@ export const usersRepository = {
     return prisma.user.findUnique({ where: { email } });
   },
 
+  findByTel(tel: string) {
+    return prisma.user.findUnique({ where: { tel } });
+  },
+
   create(data: Prisma.UserUncheckedCreateInput) {
     return prisma.user.create({ data });
   },

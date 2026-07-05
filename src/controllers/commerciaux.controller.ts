@@ -2,7 +2,9 @@ import type { Request, Response } from "express";
 import { controllerWrapper } from "../utils/controllerWapper.js";
 import { jsonResponse } from "../utils/responseApi.js";
 import { setPaginationHeaders } from "../utils/pagination.js";
+import { importRows } from "../utils/bulkImport.js";
 import { commerciauxService } from "../services/commerciaux.service.js";
+import { createCommercialSchema } from "../validators/commerciaux.validator.js";
 
 export const listCommerciaux = controllerWrapper(async (req: Request, res: Response) => {
   const { items, total, page, pageSize } = await commerciauxService.list(req.query as never);
@@ -23,4 +25,10 @@ export const createCommercial = controllerWrapper(async (req: Request, res: Resp
 export const updateCommercial = controllerWrapper(async (req: Request, res: Response) => {
   const commercial = await commerciauxService.update(req.params.id as string, req.body, { userId: req.user!.id, ip: req.ip });
   res.json(jsonResponse({ status: "success", message: "Commercial mis à jour", data: commercial }));
+});
+
+export const importCommerciaux = controllerWrapper(async (req: Request, res: Response) => {
+  const ctx = { userId: req.user!.id, ip: req.ip };
+  const report = await importRows(req.body.rows, createCommercialSchema, (row) => commerciauxService.create(row, ctx));
+  res.json(jsonResponse({ status: "success", message: "Import terminé", data: report }));
 });

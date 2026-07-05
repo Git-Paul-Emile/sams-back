@@ -4,7 +4,7 @@ import { toStockItemDto } from "../dtos/stockItems.dto.js";
 import { AppError } from "../utils/AppError.js";
 import { parsePagination } from "../utils/pagination.js";
 import { recordAuditLog } from "../utils/auditLog.js";
-import type { ListStockItemsQuery, SetStockItemStockInput } from "../validators/stockItems.validator.js";
+import type { CreateStockItemInput, ListStockItemsQuery, SetStockItemStockInput } from "../validators/stockItems.validator.js";
 import type { Prisma } from "../generated/prisma/client.js";
 
 interface ActionContext {
@@ -39,6 +39,26 @@ export const stockItemsService = {
     const item = await stockItemsRepository.findById(id);
     if (!item) throw new AppError("Article de stock introuvable", StatusCodes.NOT_FOUND);
     return toStockItemDto(item);
+  },
+
+  async create(input: CreateStockItemInput, ctx: ActionContext) {
+    const prefix = input.type === "MATIERE" ? "MP" : "PF";
+    const code = input.code ?? `${prefix}-${String((await stockItemsRepository.countByType(input.type)) + 1).padStart(3, "0")}`;
+
+    const created = await stockItemsRepository.create({
+      code,
+      designation: input.designation,
+      type: input.type,
+      categorie: input.categorie,
+      unite: input.unite,
+      stock: input.stock ?? 0,
+      min: input.min ?? 0,
+      critique: input.critique ?? 0,
+      valeurUnit: input.valeurUnit ?? 0,
+    });
+
+    await recordAuditLog({ action: "Création", module: "Stocks", ref: created.code, userId: ctx.userId, ip: ctx.ip });
+    return toStockItemDto(created);
   },
 
   async setStock(id: string, input: SetStockItemStockInput, ctx: ActionContext) {

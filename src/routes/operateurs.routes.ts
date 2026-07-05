@@ -2,6 +2,7 @@ import { Router } from "express";
 import {
   createOperateur,
   getOperateur,
+  importOperateurs,
   listOperateurs,
   updateOperateur,
 } from "../controllers/operateurs.controller.js";
@@ -11,6 +12,7 @@ import {
   listOperateursQuerySchema,
   updateOperateurSchema,
 } from "../validators/operateurs.validator.js";
+import { importEnvelopeSchema } from "../validators/import.validator.js";
 import { requireAuth } from "../middlewares/requireAuth.js";
 import { requirePermission } from "../middlewares/requirePermission.js";
 import { validateId } from "../middlewares/validateId.js";
@@ -25,6 +27,7 @@ router.use(requireAuth);
 router.get("/", validateQuery(listOperateursQuerySchema), listOperateurs);
 router.get("/:id", validateId, getOperateur);
 router.post("/", requirePermission("Admin"), validateBody(createOperateurSchema), createOperateur);
+router.post("/import", requirePermission("Admin"), validateBody(importEnvelopeSchema), importOperateurs);
 router.patch("/:id", requirePermission("Admin"), validateId, validateBody(updateOperateurSchema), updateOperateur);
 
 export default router;
